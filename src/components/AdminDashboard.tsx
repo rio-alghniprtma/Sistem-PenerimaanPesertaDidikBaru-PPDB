@@ -325,13 +325,22 @@ export default function AdminDashboard() {
                 <h3 className="font-black text-lg uppercase text-black tracking-tight flex items-center gap-2">
                   <CheckSquare size={20} /> DATA PENDAFTAR REAL-TIME
                 </h3>
-                <button
-                  onClick={fetchApplicants}
-                  disabled={loading}
-                  className="bg-black hover:bg-neutral-800 text-white font-black uppercase text-xs tracking-wider px-3 py-1.5 border-2 border-black flex items-center gap-1.5 shadow-[2px_2px_0_0_rgba(251,191,36,1)] hover:shadow-none cursor-pointer"
-                >
-                  <RefreshCw size={12} className={loading ? "animate-spin" : ""} /> Refresh
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={fetchApplicants}
+                    disabled={loading}
+                    className="bg-black hover:bg-neutral-800 text-white font-black uppercase text-xs tracking-wider px-3 py-1.5 border-2 border-black flex items-center gap-1.5 shadow-[2px_2px_0_0_rgba(251,191,36,1)] hover:shadow-none cursor-pointer"
+                  >
+                    <RefreshCw size={12} className={loading ? "animate-spin" : ""} /> Refresh
+                  </button>
+                  <button
+                    onClick={() => window.print()}
+                    className="bg-[#00D1FF] hover:bg-cyan-400 text-black font-black uppercase text-xs tracking-wider px-3 py-1.5 border-2 border-black flex items-center gap-1.5 shadow-[2px_2px_0_0_rgba(0,0,0,1)] hover:shadow-none transition-all cursor-pointer"
+                    title="Export Current Filtered List as PDF"
+                  >
+                    <FileText size={12} /> Export PDF
+                  </button>
+                </div>
               </div>
 
               {/* SEARCH & FILTERS CONTROLS */}
@@ -602,6 +611,135 @@ export default function AdminDashboard() {
           <WhatsAppConfig />
         </div>
       )}
+
+      {/* 4. HIDDEN PRINT ONLY REPORT TEMPLATE (Vector PDF printable) */}
+      <div id="ppdb-print-report" className="hidden print:block text-black bg-white p-8 font-sans">
+        {/* Kop Surat SMAN 1 */}
+        <div className="border-b-4 border-black pb-4 mb-6 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="bg-black text-[#FFDD00] p-4 border-4 border-black font-black text-2xl uppercase">
+              SMAN 1
+            </div>
+            <div>
+              <h1 className="text-2xl font-black uppercase tracking-tight leading-none text-black">PANITIA PENERIMAAN PESERTA DIDIK BARU</h1>
+              <p className="text-sm font-bold uppercase text-neutral-800 tracking-wide mt-1">SMAN 1 PPDB CENTER • TAHUN AJARAN 2026/2027</p>
+              <p className="text-[10px] font-mono text-neutral-500 uppercase mt-0.5">Jl. Pendidikan No. 45, Bandung • Telp: (022) 7654-3210</p>
+            </div>
+          </div>
+          <div className="text-right shrink-0">
+            <span className="text-[10px] font-mono font-bold border-2 border-black px-2.5 py-1 uppercase bg-neutral-100">
+              OFFICIAL REPORT
+            </span>
+            <p className="text-[9px] font-mono font-bold text-neutral-500 uppercase mt-1.5">Tgl Cetak: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+          </div>
+        </div>
+
+        {/* Title of report */}
+        <div className="text-center mb-6">
+          <h2 className="text-xl font-black uppercase tracking-tight underline decoration-2 underline-offset-4">LAPORAN DATA PENDAFTAR SISWA BARU (PPDB)</h2>
+          <p className="text-xs font-bold text-neutral-600 uppercase tracking-widest mt-1">SISTEM PPDB ONLINE TERINTEGRASI REAL-TIME</p>
+        </div>
+
+        {/* Filters and Metadata Details Grid */}
+        <div className="grid grid-cols-2 gap-4 border-2 border-black p-4 mb-6 bg-neutral-50">
+          <div>
+            <h3 className="text-xs font-black uppercase tracking-wider mb-2">PARAMETER FILTRASI:</h3>
+            <table className="text-[10px] font-bold uppercase text-neutral-700 space-y-1">
+              <tbody>
+                <tr>
+                  <td className="pr-4 pb-1">Kueri Pencarian:</td>
+                  <td className="text-black font-black">{searchQuery || "SEMUA"}</td>
+                </tr>
+                <tr>
+                  <td className="pr-4 pb-1">Filter Status:</td>
+                  <td className="text-black font-black">{statusFilter === "ALL" ? "SEMUA STATUS" : statusFilter}</td>
+                </tr>
+                <tr>
+                  <td className="pr-4 pb-1">Filter Jurusan:</td>
+                  <td className="text-black font-black">{majorFilter === "ALL" ? "SEMUA JURUSAN" : `JURUSAN ${majorFilter}`}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div className="border-l-2 border-black pl-4">
+            <h3 className="text-xs font-black uppercase tracking-wider mb-2">IKHTISAR HASIL FILTER:</h3>
+            <div className="grid grid-cols-2 gap-2 text-center">
+              <div className="border border-black p-1.5 bg-white">
+                <span className="text-[8px] font-bold text-neutral-500 uppercase block">TOTAL DATA</span>
+                <span className="text-lg font-black">{filteredApplicants.length}</span>
+              </div>
+              <div className="border border-black p-1.5 bg-white">
+                <span className="text-[8px] font-bold text-neutral-500 uppercase block">TERVERIFIKASI/LULUS</span>
+                <span className="text-lg font-black">
+                  {filteredApplicants.filter(a => a.status === RegistrationStatus.VERIFIED || a.status === RegistrationStatus.ACCEPTED).length}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Laporan Table */}
+        <table className="w-full text-left text-xs font-sans border-collapse border-2 border-black mb-10">
+          <thead className="bg-neutral-100 text-black font-black uppercase border-b-2 border-black">
+            <tr>
+              <th className="p-2.5 border-r border-black text-center w-8">No.</th>
+              <th className="p-2.5 border-r border-black w-28">No. Registrasi</th>
+              <th className="p-2.5 border-r border-black">Nama Lengkap</th>
+              <th className="p-2.5 border-r border-black w-24">NISN</th>
+              <th className="p-2.5 border-r border-black">Asal Sekolah</th>
+              <th className="p-2.5 border-r border-black w-20">Jurusan</th>
+              <th className="p-2.5 font-bold">Status</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-black">
+            {filteredApplicants.length > 0 ? (
+              filteredApplicants.map((a, idx) => (
+                <tr key={a.id} className="text-[10px] uppercase">
+                  <td className="p-2 border-r border-black text-center font-bold">{idx + 1}</td>
+                  <td className="p-2 border-r border-black font-mono font-bold">{a.id}</td>
+                  <td className="p-2 border-r border-black font-black">{a.fullName}</td>
+                  <td className="p-2 border-r border-black font-mono font-bold text-neutral-700">{a.nisn}</td>
+                  <td className="p-2 border-r border-black font-bold text-neutral-600">{a.previousSchool}</td>
+                  <td className="p-2 border-r border-black text-center font-black">{a.majorPreference}</td>
+                  <td className="p-2 font-black">
+                    <span className={`px-1.5 py-0.5 border border-black ${
+                      a.status === RegistrationStatus.PENDING ? "bg-amber-100 text-black" :
+                      a.status === RegistrationStatus.VERIFIED ? "bg-blue-100 text-blue-900" :
+                      a.status === RegistrationStatus.ACCEPTED ? "bg-green-100 text-green-900" :
+                      a.status === RegistrationStatus.REJECTED ? "bg-red-100 text-red-900" : "bg-neutral-100 text-neutral-900"
+                    }`}>
+                      {a.status}
+                    </span>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={7} className="p-4 text-center font-black text-neutral-400">
+                  TIDAK ADA DATA UNTUK FILTER BERKAS INI
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+
+        {/* Signature Blocks */}
+        <div className="flex justify-between items-start mt-12 text-xs">
+          <div>
+            <p className="font-bold uppercase text-neutral-500">Petugas / Operator Sistem,</p>
+            <div className="h-20"></div>
+            <p className="font-black uppercase tracking-wide border-b border-black pb-0.5 inline-block">PANITIA PPDB SMAN 1</p>
+            <p className="text-[9px] font-mono text-neutral-500 uppercase mt-1">Sistem Terverifikasi Digital</p>
+          </div>
+          <div className="text-right">
+            <p className="font-bold uppercase text-neutral-500">Bandung, {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+            <p className="font-bold uppercase text-neutral-500 mt-1">Ketua Panitia PPDB SMAN 1 Bandung,</p>
+            <div className="h-20"></div>
+            <p className="font-black uppercase tracking-wide border-b border-black pb-0.5 inline-block">Drs. H. Mulyana, M.Pd.</p>
+            <p className="text-[9px] font-mono text-neutral-500 uppercase mt-1">NIP. 19681120 199303 1 002</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

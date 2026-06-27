@@ -23,10 +23,11 @@
   .print\:my-0 {
     margin: 0 !important;
   }
-  #announcement-panel-container, #announcement-panel-container * {
-    visibility: visible;
+  #announcement-panel-container, #announcement-panel-container *,
+  #ppdb-print-report, #ppdb-print-report * {
+    visibility: visible !important;
   }
-  #announcement-panel-container {
+  #announcement-panel-container, #ppdb-print-report {
     position: absolute;
     left: 0;
     top: 0;
