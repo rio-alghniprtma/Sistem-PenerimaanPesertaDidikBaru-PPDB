@@ -1,0 +1,6 @@
+{
+  "name": "Sistem PPDB Sekolah",
+  "description": "Sistem Penerimaan Peserta Didik Baru (PPDB) dengan seleksi berkas, pengumuman kelulusan, dasbor monitoring real-time, dan notifikasi WhatsApp.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
