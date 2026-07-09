@@ -5,6 +5,7 @@ import {
   FileCheck2, CheckCheck, Play 
 } from "lucide-react";
 import { WhatsAppGatewayConfig, WhatsAppNotificationLog, RegistrationStatus } from "../types.js";
+import { customFetch } from "../lib/apiInterceptor.js";
 
 export default function WhatsAppConfig() {
   const [config, setConfig] = useState<WhatsAppGatewayConfig | null>(null);
@@ -20,7 +21,7 @@ export default function WhatsAppConfig() {
   const fetchConfig = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/whatsapp/config");
+      const res = await customFetch("/api/whatsapp/config");
       if (res.ok) {
         const data = await res.json();
         setConfig(data);
@@ -35,7 +36,7 @@ export default function WhatsAppConfig() {
   const fetchLogs = async () => {
     setLogsLoading(true);
     try {
-      const res = await fetch("/api/whatsapp/logs");
+      const res = await customFetch("/api/whatsapp/logs");
       if (res.ok) {
         const data = await res.json();
         setLogs(data);
@@ -61,7 +62,7 @@ export default function WhatsAppConfig() {
 
     setSaving(true);
     try {
-      const res = await fetch("/api/whatsapp/config", {
+      const res = await customFetch("/api/whatsapp/config", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(config)

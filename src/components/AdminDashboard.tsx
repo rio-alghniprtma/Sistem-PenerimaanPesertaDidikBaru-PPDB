@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { RegistrationStatus, Applicant, Document } from "../types.js";
 import WhatsAppConfig from "./WhatsAppConfig.jsx"; // We will create this next
+import { customFetch } from "../lib/apiInterceptor.js";
 
 export default function AdminDashboard() {
   const [applicants, setApplicants] = useState<Applicant[]>([]);
@@ -37,7 +38,7 @@ export default function AdminDashboard() {
   const fetchApplicants = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/applicants");
+      const res = await customFetch("/api/applicants");
       if (res.ok) {
         const data = await res.json();
         setApplicants(data);
@@ -104,7 +105,7 @@ export default function AdminDashboard() {
     const notes = docNotes[docId] || "";
 
     try {
-      const res = await fetch(`/api/applicants/${selectedApplicant.id}/documents/${docId}`, {
+      const res = await customFetch(`/api/applicants/${selectedApplicant.id}/documents/${docId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status, notes, changedBy: "Budi Santoso (Admin)" })
@@ -128,7 +129,7 @@ export default function AdminDashboard() {
     setIsUpdatingStatus(true);
 
     try {
-      const res = await fetch(`/api/applicants/${selectedApplicant.id}/status`, {
+      const res = await customFetch(`/api/applicants/${selectedApplicant.id}/status`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
@@ -158,7 +159,7 @@ export default function AdminDashboard() {
     if (!confirmSend) return;
 
     try {
-      const res = await fetch("/api/whatsapp/send-manual", {
+      const res = await customFetch("/api/whatsapp/send-manual", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ applicantId, status })

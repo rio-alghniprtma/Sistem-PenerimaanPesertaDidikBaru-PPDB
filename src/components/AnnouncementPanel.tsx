@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Search, GraduationCap, Calendar, Check, X, AlertTriangle, FileText, Printer, ShieldCheck, Download, Clock } from "lucide-react";
 import { RegistrationStatus, Applicant } from "../types.js";
+import { customFetch } from "../lib/apiInterceptor.js";
 
 export default function AnnouncementPanel() {
   const [searchKey, setSearchKey] = useState("");
@@ -19,7 +20,7 @@ export default function AnnouncementPanel() {
     setSearched(false);
 
     try {
-      const res = await fetch(`/api/applicants/${searchKey.trim()}`);
+      const res = await customFetch(`/api/applicants/${searchKey.trim()}`);
       const data = await res.json();
 
       if (res.ok) {

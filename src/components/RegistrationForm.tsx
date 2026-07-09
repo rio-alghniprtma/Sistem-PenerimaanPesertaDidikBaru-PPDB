@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { Upload, CheckCircle2, AlertTriangle, FileText, User, Hash, School, Mail, Phone, Users, ShieldCheck, ArrowRight, Loader } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { customFetch } from "../lib/apiInterceptor.js";
 
 interface DocumentUpload {
   name: "Ijazah" | "Kartu Keluarga" | "Akta Kelahiran";
@@ -188,7 +189,7 @@ export default function RegistrationForm({ onSuccess }: RegistrationFormProps) {
     };
 
     try {
-      const res = await fetch("/api/applicants", {
+      const res = await customFetch("/api/applicants", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
