@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { 
   Users, CheckSquare, ShieldCheck, XCircle, FileText, 
   Search, Filter, RefreshCw, Eye, Check, X, AlertCircle, 
-  ArrowUpRight, Send, MessageSquare, Settings, Info, Clock 
+  ArrowUpRight, Send, MessageSquare, Settings, Info, Clock, Download 
 } from "lucide-react";
 import { RegistrationStatus, Applicant, Document } from "../types.js";
 import WhatsAppConfig from "./WhatsAppConfig.jsx"; // We will create this next
@@ -98,6 +98,64 @@ export default function AdminDashboard() {
   };
 
   const maxMajorCount = Math.max(...Object.values(majorCounts), 1);
+
+  // Export filtered applicants as CSV
+  const exportToCSV = () => {
+    // CSV Header
+    const headers = [
+      "No. Registrasi",
+      "NISN",
+      "Nama Lengkap",
+      "Email",
+      "No. Telepon",
+      "Jenis Kelamin",
+      "Asal Sekolah",
+      "Nama Orang Tua",
+      "Pilihan Jurusan",
+      "Status",
+      "Tanggal Daftar",
+      "Pembaruan Terakhir"
+    ];
+
+    // Map each applicant to an array of escaped string values
+    const rows = filteredApplicants.map((a) => [
+      a.id,
+      a.nisn,
+      a.fullName,
+      a.email || "-",
+      a.phone,
+      a.gender,
+      a.previousSchool,
+      a.parentName,
+      a.majorPreference,
+      a.status,
+      a.createdAt ? new Date(a.createdAt).toLocaleString("id-ID") : "-",
+      a.updatedAt ? new Date(a.updatedAt).toLocaleString("id-ID") : "-"
+    ]);
+
+    // Format fields (wrap in double quotes, escape internal double quotes)
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(row => 
+        row.map(val => {
+          const str = val ? String(val) : "";
+          const cleanStr = str.replace(/"/g, '""');
+          return `"${cleanStr}"`;
+        }).join(",")
+      )
+    ].join("\n");
+
+    // Create a blob and download it
+    const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `ppdb_export_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   // Update specific document status
   const updateDocStatus = async (docId: string, status: "approved" | "rejected") => {
@@ -340,6 +398,13 @@ export default function AdminDashboard() {
                     title="Export Current Filtered List as PDF"
                   >
                     <FileText size={12} /> Export PDF
+                  </button>
+                  <button
+                    onClick={exportToCSV}
+                    className="bg-[#00FF66] hover:bg-emerald-400 text-black font-black uppercase text-xs tracking-wider px-3 py-1.5 border-2 border-black flex items-center gap-1.5 shadow-[2px_2px_0_0_rgba(0,0,0,1)] hover:shadow-none transition-all cursor-pointer"
+                    title="Export Current Filtered List as CSV"
+                  >
+                    <Download size={12} /> Export CSV
                   </button>
                 </div>
               </div>
